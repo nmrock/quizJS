@@ -9,6 +9,7 @@ if(!window.jQuery) {
         this.paneSelector = paneSelector || '.quiz-pane';
         this.answerSelector = answerSelector || 'li';
         this.activePane = null;
+        this.counter = 0;
         var elem = global.document.querySelector(quizSelector);
         self.panes = [];
         var paneElems = elem.querySelectorAll(this.paneSelector);
@@ -70,6 +71,7 @@ if(!window.jQuery) {
             this.activePane.elem.classList.remove('active');
         }
         this.activePane = this.panes.shift();
+        this.counter++;
         console.log(this.activePane);
         if (this.activePane) {
             this.activePane.elem.classList.add('active');
@@ -103,10 +105,10 @@ if(!window.jQuery) {
                 
         }
         
-        elem.style.width = self.panes[0].
+        //elem.style.width = self.panes[0].
         
         var width = this.activePane.elem.offsetWidth;
-        this.$this.find('.quiz-wrapper').css({'transform':'translateX(' + (-1 * width  * currentPaneIndex) +'px)'});
+        this.querySelector('.quiz-wrapper').left({'transform':'translateX(' + (-1 * width  * this.counter) +'px)'});
     }
     
     jsQuiz.prototype.closeOut = function() {

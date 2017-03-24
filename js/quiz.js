@@ -1,3 +1,7 @@
+if(!window.jQuery) {
+    throw 'Sorry, quizJS cannot run without jQuery!'
+}
+    
 (function($, global) {
     var jsQuiz = function(quizSelector) {
         var self = this;
@@ -6,8 +10,11 @@
         $this.find('.quiz-pane').each(function() {
             self.panes.push(new quizPane(this, self));
         });
-        
+        if (!self.panes.length) {
+            throw 'No questions found!';
+        }
         self.panes[0].setActive();
+        self.panes[self.panes.length - 1].isLast = true;
         
         
         //Remove any dangling class attributes that don't define a class.
@@ -31,7 +38,7 @@
     }
         
     //Increments to next question if it exists
-    //Returns false if there are no more questions;
+    //Otherwise, increments to quiz results pane and calls closeOut.
     jsQuiz.prototype.nextQuestion = function() {
         var currentPaneIndex = this.getActivePaneIndex();
         this.panes[currentPaneIndex].setInactive();
@@ -39,17 +46,19 @@
         currentPaneIndex++;
         if (this.panes[currentPaneIndex]) {
             this.panes[currentPaneIndex].setActive();
-            var width = this.panes[0].getWidth();
-            this.$this.find('.quiz-wrapper').css({'transform':'translateX(' + (-1 * width  * currentPaneIndex) +'px)'});
-            
         } else {
             this.closeOut();
-                return false;
+                
         }
+        var width = this.panes[0].getWidth();
+        this.$this.find('.quiz-wrapper').css({'transform':'translateX(' + (-1 * width  * currentPaneIndex) +'px)'});
     }
     
     jsQuiz.prototype.closeOut = function() {
         console.log('You got ' + this.howManyCorrect() + ' out of ' + this.panes.length + '.');
+        var $this = this.$this;
+        $this.find('.num-correct').text(this.howManyCorrect());
+        $this.find('.num-total').text(this.panes.length);
     }
     
     jsQuiz.prototype.howManyTotal = function() {
@@ -93,14 +102,23 @@
         return function() {
             if (!self.submitted) {
                 var correct = self.correct;
-                var selected = self.$this.find('.selected').text();
-                if (correct === selected) {
+                var $selected = self.$this.find('.selected');
+                if (!$selected.length) {
+                    console.log('Please select an answer!');
+                    return;
+                }
+                if (correct === $selected.text()) {
                     console.log("yes, you are correct!");
                     self.result = 1;
                 } else {
                     console.log("WRONG");
                 }
                 self.submitted = true;
+                console.log(self);
+                if (self.isLast)
+                    self.button.text('Show Results');
+                else
+                    self.button.text('Next Question');
             } else {
                 if (self.isActive()) {
                     self.parent.nextQuestion();

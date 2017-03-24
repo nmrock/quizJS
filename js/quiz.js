@@ -1,3 +1,4 @@
+'use strict';
 if(!window.jQuery) {
     throw 'Sorry, quizJS cannot run without jQuery!'
 }
@@ -158,8 +159,8 @@ if(!window.jQuery) {
     
 })(jQuery, window);
 
-myfirstQuiz = new jsQuiz('.myfirstquiz');
-mysecondQuiz = new jsQuiz('.mysecondquiz');
+var myfirstQuiz = new jsQuiz('.myfirstquiz');
+var mysecondQuiz = new jsQuiz('.mysecondquiz');
 //console.log(myfirstQuiz);
 //console.log(myfirstQuiz);
 

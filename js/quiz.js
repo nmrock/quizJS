@@ -3,27 +3,80 @@ if(!window.jQuery) {
     throw 'Sorry, quizJS cannot run without jQuery!'
 }
     
-(function($, global) {
-    var jsQuiz = function(quizSelector) {
+(function(global) {
+    var jsQuiz = function(quizSelector, paneSelector, answerSelector) {
         var self = this;
-        var $this = self.$this = $(quizSelector);
+        this.paneSelector = paneSelector || '.quiz-pane';
+        this.answerSelector = answerSelector || 'li';
+        this.activePane = null;
+        var elem = global.document.querySelector(quizSelector);
         self.panes = [];
-        $this.find('.quiz-pane').each(function() {
-            self.panes.push(new quizPane(this, self));
-        });
+        var paneElems = elem.querySelectorAll(this.paneSelector);
+        
+        for (var i = 0; i < paneElems.length; i++) {
+            self.panes.push(new quizPane(paneElems[i], answerSelector, self));
+        }
+    
+        
         if (!self.panes.length) {
             throw 'No questions found!';
         }
-        self.panes[0].setActive();
-        self.panes[self.panes.length - 1].isLast = true;
         
+        console.log(self);
+        
+       self.panes[self.panes.length - 1].isLast = true;
+        console.log(self);
         
         //Remove any dangling class attributes that don't define a class.
         $('*[class=""]').removeAttr('class');
         
-        $this.width(self.panes[0].$this.width());
+        elem.style.width = self.panes[0].elem.offsetWidth + 'px';
+        
+        elem.addEventListener('click', function(e) {self.clickHandler(e)});
+        
+        self.setActivePane();
+    }
+    
+ 
+    
+ 
+    jsQuiz.prototype.clickHandler = function(e) {
+        
+        var elem = e.target
+        
+        //If the user clicked an answer option in the active pane
+        //And they have not already submitted an answer, select the clicked elem
+        if (elem.matches('.active ' + this.answerSelector)
+            && !elem.matches('.submitted' + this.answerSelector)) {
+           
+            var prevSelected = this.activePane.elem.querySelector('.selected')
+            if (prevSelected) {
+                prevSelected.classList.remove('selected');
+            }
+            
+            elem.classList.add('selected');      
+        }
+        
+        if (elem.matches('.active button'))
+            {
+                console.log('button click');
+                this.nextQuestion();
+            }
     }
 
+     
+    jsQuiz.prototype.setActivePane = function() {
+        if (this.activePane) {
+            this.activePane.elem.classList.remove('active');
+        }
+        this.activePane = this.panes.shift();
+        console.log(this.activePane);
+        if (this.activePane) {
+            this.activePane.elem.classList.add('active');
+        }
+    }
+    
+    
     jsQuiz.prototype.howManyCorrect = function() {
         var theresults = 0;
         this.panes.forEach(x => theresults += x.result);
@@ -41,17 +94,18 @@ if(!window.jQuery) {
     //Increments to next question if it exists
     //Otherwise, increments to quiz results pane and calls closeOut.
     jsQuiz.prototype.nextQuestion = function() {
-        var currentPaneIndex = this.getActivePaneIndex();
-        this.panes[currentPaneIndex].setInactive();
         
-        currentPaneIndex++;
-        if (this.panes[currentPaneIndex]) {
-            this.panes[currentPaneIndex].setActive();
-        } else {
+        this.setActivePane();
+        
+        
+        if (!this.activePane) {
             this.closeOut();
                 
         }
-        var width = this.panes[0].getWidth();
+        
+        elem.style.width = self.panes[0].
+        
+        var width = this.activePane.elem.offsetWidth;
         this.$this.find('.quiz-wrapper').css({'transform':'translateX(' + (-1 * width  * currentPaneIndex) +'px)'});
     }
     
@@ -65,42 +119,37 @@ if(!window.jQuery) {
     jsQuiz.prototype.howManyTotal = function() {
         return this.panes.length;
     }
-    var quizPane = function(elem, parent) {
+    var quizPane = function(elem, answerSelector, parent) {
         var self = this;
-        var $this = self.$this = $(elem);
+        var elem = self.elem = elem;
+        var answerElems = elem.querySelectorAll(answerSelector);
+        
         self.parent = parent;
         self.submitted = false;
         self.result = 0;
-        self.correct = $this.find('.correct-answer').text();
+        self.correct = elem.querySelector('.correct-answer').textContent;
         self.answers = [];
-        $this.find('li').each(function() {
-            self.answers.push(new quizAnswer(this, self));
-        });
         
-        self.button = $this.find('button');
-        self.button.click(self.checkAnswer(self));
-        $this.on('click', 'li', this.selected(self));
+        quizAnswer.prototype.parent = parent;
         
-    }
-    
-    // Creating closure so function can access current pane
-    quizPane.prototype.selected = function(pane) {
-        return function() {
-            if (!pane.submitted && pane.isActive()) {
-                var $this = $(this);
-                $this.siblings().removeClass('selected');
-                $(this).addClass('selected'); 
-            }
-        
+        for (var i = 0; i < answerElems.length; i++) {
+            self.answers.push(new quizAnswer(answerElems[i]));
         }
+        
+        //self.button = $this.find('button');
+        //self.button.click(self.checkAnswer(self));
+        //$this.on('click', 'li', this.selected(self));
+        
+        
     }
-    
+
+
     quizPane.prototype.getWidth = function() {
         return this.$this.width();
     }
     
-    quizPane.prototype.checkAnswer = function(self) {
-        return function() {
+    quizPane.prototype.checkAnswer = function() {
+            //this.activePane
             if (!self.submitted) {
                 var correct = self.correct;
                 var $selected = self.$this.find('.selected');
@@ -126,19 +175,13 @@ if(!window.jQuery) {
                 }
             }
         }
-    }
+    
     
     quizPane.prototype.isActive = function() {
         return this.$this.hasClass('active');
     }
-    
-    quizPane.prototype.setActive = function() {
-        this.$this.addClass('active');
-    }
-    
-    quizPane.prototype.setInactive = function() {
-        this.$this.removeClass('active');
-    }
+   
+
     
     var quizAnswer = function(elem, parent) {
         var self = this;
@@ -157,10 +200,12 @@ if(!window.jQuery) {
     
     global.jsQuiz = jsQuiz.init;
     
-})(jQuery, window);
+    
+    
+})(window);
 
 var myfirstQuiz = new jsQuiz('.myfirstquiz');
-var mysecondQuiz = new jsQuiz('.mysecondquiz');
+//var mysecondQuiz = new jsQuiz('.mysecondquiz');
 //console.log(myfirstQuiz);
 //console.log(myfirstQuiz);
 

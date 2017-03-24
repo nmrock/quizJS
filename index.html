@@ -12,8 +12,35 @@
     <link rel="icon" href="images/favicon.png"> -->
     
     <style>
+        .myfirstquiz{
+            margin: 0 auto;
+            position:relative;
+            width: 80%;
+            overflow:hidden;
+        }
+        .quiz-wrapper {
+            font-size: 0;
+            white-space: nowrap;
+            transition: all 200ms ease;
+            margin: 0;
+            padding: 0;
+            
+        }
         ul li.selected{
             background-color: grey;
+        }
+        
+        .quiz-pane {    
+            display:inline-block;
+            
+            font-size: 1rem;
+            width:100%;
+            margin: 0;
+            padding: 0;
+        }
+        
+        .quiz-pane.active {
+            
         }
     </style>
 </head>
@@ -21,8 +48,7 @@
 <body>
 
 
-
-
+<section>
     <div class="myfirstquiz">
         <div class="quiz-wrapper">
             <div class="quiz-pane">
@@ -127,7 +153,7 @@
             </div>
         </div>
     </div>
-    
+    </section>
       <div class="mysecondquiz">
         <div class="quiz-wrapper">
             <div class="quiz-pane">

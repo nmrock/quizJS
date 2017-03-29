@@ -6,39 +6,179 @@
     <meta http-equiv="x-ua-compatible" content="ie=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <title></title>
+    <title>Just Think Twice</title>
 
     <!-- <link rel="stylesheet" href="css/main.css">
     <link rel="icon" href="images/favicon.png"> -->
     
     <style>
-        .myfirstquiz{
-            margin: 0 auto;
-            position:relative;
-            width: 80%;
-            overflow:hidden;
-        }
-        .quiz-wrapper {
-            font-size: 0;
-            white-space: nowrap;
-            transition: all 200ms ease;
-            margin: 0;
-            padding: 0;
-            
-        }
-        li.selected{
-            background-color: grey;
-        }
-        
-        .quiz-pane, .quiz-results {    
-            display:inline-block;
-            
-            font-size: 1rem;
-            width:100%;
-            margin: 0;
-            padding: 0;
-        }
-        
+
+        @keyframes selected {
+    0% {transform: translateX(-100%);}
+    100% {transform: translateX(0);}
+}
+
+.quizjs{
+    margin: 0 auto;
+    position:relative;
+    min-width: 250px;
+    overflow:hidden;
+}
+
+
+@media screen and (max-width: 414px) {
+    .quiz-wrapper > div{
+    max-width: 500px;
+    min-width: 250px;
+    }
+}
+
+@media screen and (min-width: 415px) {
+        .quiz-wrapper > div{
+        width:500px;
+    }
+}
+
+.active li {
+    font-size: 22px; 
+    font-weight: 400;
+    padding: 20px 15px;
+    white-space:normal;
+    text-align: left;
+}
+.quiz-wrapper {
+    font-size: 0;
+    white-space: nowrap;
+    transition: all 200ms ease;
+    margin: 0;
+    padding: 0;
+    position:relative;      
+    will-change: transform; 
+}
+
+.quiz-wrapper > div {
+    display:inline-block;
+    text-align: center;
+    font-size: 1.5rem;
+    margin: 0;
+    padding: 0;
+    vertical-align:top;
+    border: 1px solid #ddd;
+    overflow: hidden;
+    padding-right: 40px;
+}
+
+.quiz-wrapper > .quiz-results  {
+        padding:80px 0;
+    }
+
+.quiz-wrapper h4 {
+        margin: 15px;
+    }
+
+.active li,
+.message {
+    margin-left: 0;
+    margin: 15px 0;
+    padding: 0 30px;
+    text-align:left;
+    white-space: normal;
+    margin-left: 0 !important;
+    
+}   
+.active li {
+    list-style: none;
+    padding: 5px 10px;
+    border: 1px solid #ddd;
+    border-bottom: none;
+    position:relative;
+    overflow:hidden;
+    margin: 0;
+    z-index: 5;
+}
+
+.active li:last-child {
+    border-bottom: 1px solid #ddd;
+}
+
+.active:not(.submitted) li:hover,
+.active .selected {
+    font-weight: bold;
+}
+
+.active .selected:before,
+ .active .correct-post-submit:before {
+    content: '';
+    width: 100%;
+    height: 100%;
+    position:absolute;
+    margin-left: -10px;
+    top: 0;
+    z-index: -1;
+    animation: selected 0.3s forwards ease;
+    transition: background-color 0.3s ease;
+}
+
+.active .selected:before {
+    transform: translateX(-100%);
+    background-color: #ddd;
+}
+
+.active .correct-post-submit:before {
+    background-color: #539e53;
+}
+.active .correct-post-submit,
+.active.submitted .selected:not(.correct-post-submit) {
+    color: #fff;
+}
+
+.active.submitted .selected:not(.correct-post-submit):before {
+    background-color: #f14848;
+}
+
+.message {
+    min-height: 50px;
+}
+
+.message .correct,
+.message .incorrect {
+    font-weight: bold;
+    font-style: italic;
+}
+
+.btn {
+    margin: 0 30px 20px;
+    display: inline-block;
+    font-weight: 400;
+    line-height: 1.25;
+    text-align: center;
+    white-space: nowrap;
+    vertical-align: middle;
+    user-select: none;
+    border: 1px solid transparent;
+    padding: .5rem 1rem;
+    font-size: 1rem;
+    border-radius: 0.25rem;
+    transition: all .2s ease-in-out;
+    color: #292b2c;
+    background-color: #fff;
+    border-color: #ccc;
+}
+
+.btn:focus, .btn:hover {
+    text-decoration: none;
+}
+
+.btn:hover, .btn:focus {
+    color: #292b2c;
+    background-color: #e6e6e6;
+    border-color: #adadad;
+}
+
+.counter {
+    font-style:italic;
+}
+
     </style>
 </head>
 
@@ -46,136 +186,87 @@
 
 
 <section>
-    <div class="myfirstquiz">
-        <div class="quiz-wrapper">
-            <div class="quiz-pane">
-                <div class="quiz-question">Slide 1</div>
-                <ul class="answer-options">
-                    <li class="test correct-answer">Option 1 - 1</li>
-                    <li>Option 1 - 2</li>
-                    <li class="test">Option 1 - 3</li>
-                    <li>Option 1 - 4</li>
-                </ul>
-                <button>Submit</button>
-            </div>
-            <div class="quiz-pane">
-                <div class="quiz-question">Slide 2</div>
-                <ul class="answer-options">
-                    <li>Option 2 - 1</li>
-                    <li>Option 2 - 2</li>
-                    <li class="correct-answer">Option 2 - 3</li>
-                    <li>Option 2 - 4</li>
-                </ul>
-                <button>Submit</button>
-            </div>
-            <div class="quiz-pane">
-                <div class="quiz-question">Slide 3</div>
-                <ul class="answer-options">
-                    <li>Option 3 - 1</li>
-                    <li>Option 3 - 2</li>
-                    <li class="correct-answer">Option 3 - 3</li>
-                    <li>Option 3 - 4</li>
-                </ul>
-                <button>Submit</button>
-            </div>
-            <div class="quiz-pane">
-                <div class="quiz-question">Slide 4</div>
-                <ul class="answer-options">
-                    <li>Option 4 - 1</li>
-                    <li>Option 4 - 2</li>
-                    <li class="correct-answer">Option 4 - 3</li>
-                    <li>Option 4 - 4</li>
-                </ul>
-                <button>Submit</button>
-            </div>
-            <div class="quiz-pane">
-                <div class="quiz-question">Slide 5</div>
-                <ul class="answer-options">
-                    <li>Option 5 - 1</li>
-                    <li>Option 5 - 2</li>
-                    <li class="correct-answer">Option 5 - 3</li>
-                    <li>Option 5 - 4</li>
-                </ul>
-                <button>Submit</button>
-            </div>
-            <div class="quiz-pane">
-                <div class="quiz-question">Slide 6</div>
-                <ul class="answer-options">
-                    <li>Option 6 - 1</li>
-                    <li>Option 6 - 2</li>
-                    <li class="correct-answer">Option 6 - 3</li>
-                    <li>Option 6 - 4</li>
-                </ul>
-                <button>Submit</button>
-            </div>
-            <div class="quiz-pane">
-                <div class="quiz-question">Slide 7</div>
-                <ul class="answer-options">
-                    <li>Option 7 - 1</li>
-                    <li>Option 1 - 2</li>
-                    <li class="correct-answer">Option 7 - 3</li>
-                    <li>Option 7 - 4</li>
-                </ul>
-                <button>Submit</button>
-            </div>
-            <div class="quiz-pane">
-                <div class="quiz-question">Slide 8</div>
-                <ul class="answer-options">
-                    <li>Option 8 - 1</li>
-                    <li>Option 8 - 2</li>
-                    <li class="correct-answer">Option 8 - 3</li>
-                    <li>Option 8 - 4</li>
-                </ul>
-                <button>Submit</button>
-            </div>
-            <div class="quiz-pane">
-                <div class="quiz-question">Slide 9</div>
-                <ul class="answer-options">
-                    <li>Option 9 - 1</li>
-                    <li>Option 1 - 2</li>
-                    <li class="correct-answer">Option 9 - 3</li>
-                    <li>Option 9 - 4</li>
-                </ul>
-                <button>Submit</button>
-            </div>
-            <div class="quiz-pane">
-                <div class="quiz-question">Slide 10</div>
-                <ul class="answer-options">
-                    <li>Option 10 - 1</li>
-                    <li>Option 10 - 2</li>
-                    <li class="correct-answer">Option 10 - 3</li>
-                    <li>Option 10 - 4</li>
-                </ul>
-                <button>Submit</button>
-            </div>
-            <div class="quiz-results">
-                <h4>You got <span class="num-correct"></span> correct out of <span class="num-total"></span> total.</h4>
-            </div>
+    
+    <div class="quizjs">
+       <div class='quiz-pane'>
+        <div>Question</div>
+           <ul>
+           <li>q1</li>
+            <li>q2</li>
+            <li>q3</li>
+               <li>q4</li>
+               <li class='correct-answer'>q5</li>
+           </ul>
+        </div>
+        <div class='quiz-pane'>
+        <div>Question</div>
+           <ul>
+           <li>q1</li>
+            <li>q2</li>
+            <li>q3</li>
+               <li>q4</li>
+               <li class='correct-answer'>q5</li>
+           </ul>
+        </div>
+        <div class='quiz-pane'>
+        <div>Question</div>
+           <ul>
+           <li>q1</li>
+            <li>q2</li>
+            <li>q3</li>
+               <li>q4</li>
+               <li class='correct-answer'>q5</li>
+           </ul>
+        </div>
+        <div class='quiz-pane'>
+        <div>Question</div>
+           <ul>
+           <li>q1</li>
+            <li>q2</li>
+            <li>q3</li>
+               <li>q4</li>
+               <li class='correct-answer'>q5</li>
+           </ul>
+        </div>
+        <div class='quiz-pane'>
+        <div>Question</div>
+           <ul>
+           <li>q1</li>
+            <li>q2</li>
+            <li>q3</li>
+               <li>q4</li>
+               <li class='correct-answer'>q5</li>
+           </ul>
+        </div>
+        <div class='quiz-pane'>
+        <div>Question</div>
+           <ul>
+           <li>q1</li>
+            <li>q2</li>
+            <li>q3</li>
+               <li>q4</li>
+               <li class='correct-answer'>q5</li>
+           </ul>
+        </div>
+        <div class='quiz-pane'>
+        <div>Question</div>
+           <ul>
+           <li>q1</li>
+            <li>q2</li>
+            <li>q3</li>
+               <li>q4</li>
+               <li class='correct-answer'>q5</li>
+           </ul>
         </div>
     </div>
+
     </section>
-      <div class="mysecondquiz">
-        <div class="quiz-wrapper">
-            <div class="quiz-pane">
-                <div class="quiz-question">Slide 1</div>
-                <ul class="answer-options">
-                    <li class="correct-answer">Option 1 - 1</li>
-                    <li>Option 1 - 2</li>
-                    <li class="test">Option 1 - 3</li>
-                    <li>Option 1 - 4</li>
-                </ul>
-                <button>Submit</button>
-            </div>
-            <div class="quiz-results">
-                <h4>You got <span class="num-correct"></span> correct out of <span class="num-total"></span> total.</h4>
-            </div>
-          </div>
-    </div>
-
-
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
     <script src="js/quiz.js"></script>
+    <script>
+        var myfirstQuiz = new jsQuiz('.quizjs', '.quiz-pane');
+    </script>
 </body>
 
 </html>

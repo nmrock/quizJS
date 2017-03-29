@@ -4,6 +4,8 @@
     
 (function(global, myJquery) {
     
+    //Polyfill
+    //https://developer.mozilla.org/en-US/docs/Web/API/Element/matches
     if (!Element.prototype.matches) {
         Element.prototype.matches = 
             Element.prototype.matchesSelector || 
@@ -17,8 +19,9 @@
                 while (--i >= 0 && matches.item(i) !== this) {}
                 return i > -1;            
             };
-    }
+    }    
     
+    //http://stackoverflow.com/questions/6238351/fastest-way-to-detect-external-urls
     var isExternalRegexClosure = (function(){
         var domainRe = /https?:\/\/((?:[\w\d-]+\.)+[\w\d]{2,})/i;
 
@@ -31,13 +34,28 @@
         }
     })();
     
-    var buildElem = function(typeOfNode, classToAdd) {
-        var newElem = global.document.createElement(typeOfNode);
-        newElem.classList.add(classToAdd);
-        return newElem;
+    //http://stackoverflow.com/questions/2450954/how-to-randomize-shuffle-a-javascript-array
+    var shuffle = function(array) {
+        var currentIndex = array.length, temporaryValue, randomIndex;
+
+        // While there remain elements to shuffle...
+        while (0 !== currentIndex) {
+
+            // Pick a remaining element...
+            randomIndex = Math.floor(Math.random() * currentIndex);
+            currentIndex -= 1;
+
+            // And swap it with the current element.
+            temporaryValue = array[currentIndex];
+            array[currentIndex] = array[randomIndex];
+            array[randomIndex] = temporaryValue;
+        }
+
+        return array;
     }
-     
+    
     //Checks elem and parent elems for a tag.
+    //http://stackoverflow.com/questions/5540555/how-to-check-if-dom-textnode-is-a-link
      var isLink = function(elem) {
         var curNode = elem;
         while (curNode) {
@@ -49,7 +67,15 @@
         }
         return false;
     }
-
+    
+    var buildElem = function(typeOfNode, classToAdd) {
+        var newElem = global.document.createElement(typeOfNode);
+        newElem.classList.add(classToAdd);
+        return newElem;
+    }
+    
+    
+    /* === CONSTRUCTORS === */
     var jsQuiz = function(quizSelector, paneSelector, answerSelector) {
         var self = this;
         this.paneSelector = paneSelector || '.quiz-pane';
@@ -85,6 +111,30 @@
         self.setActivePane();
     }
 
+    var quizPane = function(elem, answerSelector, parent) {
+        var self = this;
+        var elem = self.elem = elem;
+        this.correctElem = elem.querySelector('.correct-answer') || self.correctElem;
+        this.message = this.getMessage();
+        this.messageContent = this.message.innerHTML;
+        this.answers = elem.querySelectorAll(answerSelector);
+        this.list = this.answers[0].parentNode;
+        this.message.textContent = "";
+        self.parent = parent;
+        self.submitted = false;
+        self.result = 0;
+        self.correct = this.correctElem.textContent;
+        this.correctElem.classList.remove('correct-answer');
+        if (self.correctElem.classList == "") {
+            self.correctElem.removeAttribute('class');
+        }
+        this.shuffleAnswers();
+    }
+    
+    /* === END CONSTRUCTORS === */
+    
+    /* === Prototype functions === */
+        /* === jsQuiz Prototype functions === */
     
     jsQuiz.prototype.buildQuizWrapper = function() {
         this.quizWrapper = this.elem.querySelector('.quiz-wrapper');
@@ -161,30 +211,29 @@
         }
         
         if (elem.matches('.active button'))
-            {
-                if (this.activePane.checkAnswer()) {
-                    this.theResults++;
-                }
-              //  this.nextQuestion();
+        {
+            if (this.activePane.checkAnswer()) {
+                this.theResults++;
             }
-             // Leaving site notice
-            var linkElem = isLink(elem)
-            if (linkElem) {
-                if (isExternalRegexClosure(linkElem.href)) {
-                    var linkedUrl = linkElem.host.split('.');
-                    if (linkedUrl.length > 1) {
-                        var topLevelDomain = linkedUrl[linkedUrl.length - 1];
-                        if (topLevelDomain !== "gov" && topLevelDomain != "mil") {
-                            var siteName = document.title.split('|').pop().trim() || 'our site';
-                            if (confirm('Thank you for visiting ' + siteName + '. You are now leaving the site. We do not exercise control over the content of external websites. Click OK to continue.')) {
+        }
+        // Leaving site notice
+        var linkElem = isLink(elem)
+        if (linkElem) {
+            if (isExternalRegexClosure(linkElem.href)) {
+                var linkedUrl = linkElem.host.split('.');
+                if (linkedUrl.length > 1) {
+                    var topLevelDomain = linkedUrl[linkedUrl.length - 1];
+                    if (topLevelDomain !== "gov" && topLevelDomain != "mil") {
+                        var siteName = document.title.split('|').pop().trim() || 'our site';
+                        if (confirm('Thank you for visiting ' + siteName + '. You are now leaving the site. We do not exercise control over the content of external websites. Click OK to continue.')) {
 
-                            } else {
-                                e.preventDefault();
-                            }
+                        } else {
+                            e.preventDefault();
                         }
                     }
                 }
             }
+        }
     }
 
      
@@ -210,25 +259,17 @@
     //Increments to next question if it exists
     //Otherwise, increments to quiz results pane and calls closeOut.
     jsQuiz.prototype.nextQuestion = function() {
-        
         this.setActivePane();
-        
-        
-        
         if (!this.activePane) {
             this.closeOut();
-                
         }
         
-        
         var width = this.activePaneWidth;
-
         this.quizWrapper.style.transform = 'translateX(' + (-1 * width  * this.counter) +'px)';
     }
     
     jsQuiz.prototype.closeOut = function() {
         this.counterMessage.textContent = "";       
-        
         this.correctPlaceholder.textContent = this.howManyCorrect();
         this.totalPlaceholder.textContent = this.totalPanes;
     }
@@ -237,29 +278,9 @@
         return this.panes.length;
     }
     
-    
-    var quizPane = function(elem, answerSelector, parent) {
-        var self = this;
-        var elem = self.elem = elem;
-        this.correctElem = elem.querySelector('.correct-answer') || self.correctElem;
-        this.message = this.getMessage();
-        this.messageContent = this.message.innerHTML;
-        this.answers = elem.querySelectorAll(answerSelector);
-        this.list = this.answers[0].parentNode;
-        this.message.textContent = "";
-        self.parent = parent;
-        self.submitted = false;
-        self.result = 0;
-        self.correct = this.correctElem.textContent;
-        this.correctElem.classList.remove('correct-answer');
-        if (self.correctElem.classList == "") {
-            self.correctElem.removeAttribute('class');
-        }
+        /* === END jsQuiz Prototype functions === */
+        /* === quizPane Prototype functions === */
         
-
-        this.shuffleAnswers();
-    }
-    
     //Using prototype chain to handle undefined correctElem
     quizPane.prototype.correctElem = {
         textContent: '',
@@ -339,36 +360,14 @@
                 return 0;
             }
         }
-    
+        /* === END quizPane Prototype functions === */
+    /* === END Prototype functions === */
 
     
     jsQuiz.init = function(quizSelector, paneSelector, answerSelector) {
         new jsQuiz(quizSelector, paneSelector, answerSelector);
     }
- 
-    function shuffle(array) {
-        var currentIndex = array.length, temporaryValue, randomIndex;
-
-        // While there remain elements to shuffle...
-        while (0 !== currentIndex) {
-
-            // Pick a remaining element...
-            randomIndex = Math.floor(Math.random() * currentIndex);
-            currentIndex -= 1;
-
-            // And swap it with the current element.
-            temporaryValue = array[currentIndex];
-            array[currentIndex] = array[randomIndex];
-            array[randomIndex] = temporaryValue;
-        }
-
-        return array;
-    }
     
     global.jsQuiz = jsQuiz.init;
     
-    
 })(window);
-
-
-

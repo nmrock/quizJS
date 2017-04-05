@@ -146,7 +146,9 @@
         this.correctElem = elem.querySelector('.correct-answer') || self.correctElem;
         this.message = this.getMessage();
         this.messageContent = this.message.innerHTML;
-        this.answers = elem.querySelectorAll(answerSelector);
+
+        this.buildAnswers(answerSelector);
+
         this.list = this.answers[0].parentNode;
         this.message.textContent = "";
         this.parent = parent;
@@ -195,6 +197,8 @@
             this.resultsPane = buildElem('div', 'quiz-results'); 
             this.quizWrapper.appendChild(this.resultsPane);
         }
+        
+        this.resultsPane.setAttribute('aria-hidden', 'true');
         
         //Once results pane exists, ensure results message exists.
         //Return results to allow chaining.
@@ -421,6 +425,14 @@
                 return 0;
             }
         }
+    
+    quizPane.prototype.buildAnswers = function(answerSelector) {
+        this.answers = this.elem.querySelectorAll(answerSelector);
+        for (var i = 0; i < this.answers.length; i++) {
+            this.answers[i].setAttribute('aria-pressed', 'false');
+            this.answers[i].setAttribute('role', 'button');
+        }
+    }
         /* === END quizPane Prototype functions === */
     /* === END Prototype functions === */
 

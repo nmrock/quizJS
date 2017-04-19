@@ -1,9 +1,6 @@
 
-'use strict';
-
-    
-(function(global, myJquery) {
-    
+(function(global) {
+    'use strict';
     //Polyfill
     //https://developer.mozilla.org/en-US/docs/Web/API/Element/matches
     if (!Element.prototype.matches) {
@@ -428,10 +425,14 @@
     
     quizPane.prototype.buildAnswers = function(answerSelector) {
         this.answers = this.elem.querySelectorAll(answerSelector);
-        for (var i = 0; i < this.answers.length; i++) {
+        this.answers.forEach(answer => {
+            answer.setAttribute('aria-pressed', 'false');
+                                    answer.setAttribute('role', 'button');
+                                   });
+       /* for (var i = 0; i < this.answers.length; i++) {
             this.answers[i].setAttribute('aria-pressed', 'false');
             this.answers[i].setAttribute('role', 'button');
-        }
+        }*/
     }
         /* === END quizPane Prototype functions === */
     /* === END Prototype functions === */

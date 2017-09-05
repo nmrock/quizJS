@@ -1,7 +1,7 @@
-#Quiz
+# Quiz
 Javascript app for a purely front-end interactive quiz. [Click here](https://codepen.io/nmrock/full/Ljvdgq/) to see a demo. 
 
-#Getting Started	
+# Getting Started	
 To implement, you need a minimum of the following:
 
 ~~~~
@@ -42,4 +42,4 @@ You can add optional messages that are revealed after the user has submitted an 
 
  <script src="js/quiz.js"></script>
 ~~~~
-##More to come.
+## More to come.

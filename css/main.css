@@ -21,24 +21,8 @@
   .quiz .counter {
     display: none !important;
   }
-  .quiz {
-    width: 500px !important;
-  }
   .quiz .btn {
     display: none !important;
-  }
-}
-
-@media screen and (max-width: 414px) {
-  .quiz-wrapper>div {
-    max-width: 500px;
-    min-width: 250px;
-  }
-}
-
-@media screen and (min-width: 415px) {
-  .quiz-wrapper>div {
-    width: 500px;
   }
 }
 
@@ -47,6 +31,7 @@
   position: relative;
   min-width: 250px;
   overflow: hidden;
+  max-width: 500px;
 }
 
 .quiz-pane li {
@@ -97,6 +82,7 @@
   text-align: center;
   font-size: 1.5rem;
   width: 100%;
+  box-sizing: border-box;
   margin: 0;
   padding: 0;
   vertical-align: top;
